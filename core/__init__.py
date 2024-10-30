@@ -1,0 +1,1 @@
+"""Initialise ProSync Core App."""

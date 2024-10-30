@@ -1,4 +1,4 @@
-"""Django production settings for ProSync project."""
+"""Django staging settings for ProSync project."""
 
 import environ
 from django.conf import settings
@@ -10,80 +10,79 @@ env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False)
 )
-environ.Env.read_env(os.path.join(BASE_DIR, ".env/.production"))  # noqa: F405
-
+environ.Env.read_env(os.path.join(BASE_DIR, ".env/.staging"))  # noqa: F405
 
 logger = logging.getLogger(__name__)
 
 
 ALLOWED_HOSTS = env.list(
-    "PROD_ALLOWED_HOSTS",
+    "STAGING_ALLOWED_HOSTS",
     default=[""],
 )
 
-DEBUG = env("PROD_DJANGO_DEBUG", default=False)
+DEBUG = env("STAGING_DJANGO_DEBUG", default=False)
 
 
 DJANGO_LOGGING_MAIL_ADMINS = env(
-    "PROD_DJANGO_LOGGING_MAIL_ADMINS",
+    "STAGING_DJANGO_LOGGING_MAIL_ADMINS",
     default="ERROR",
 )
 
 DJANGO_LOGGING_LEVEL = env(
-    "PROD_DJANGO_LOGGING_LEVEL",
+    "STAGING_DJANGO_LOGGING_LEVEL",
     default="INFO",
 )
 
 DJANGO_LOG_FILE = env(
-    "PROD_DJANGO_LOG_FILE",
+    "STAGING_DJANGO_LOG_FILE",
     default="logging/rotating.log",
 )
 
 DJANGO_SETTINGS_MODULE = env(
-    "PROD_DJANGO_SETTINGS_MODULE",
-    default="config.settings.production",
+    "STAGING_DJANGO_SETTINGS_MODULE",
+    default="config.settings.staging",
 )
 
 
 DATABASES = {
     "default": env.db(
-        "PROD_DATABASE_URL",
+        "STAGING_DATABASE_URL",
     ),
 }
 
 EMAIL_BACKEND = env(
-    "PROD_EMAIL_BACKEND",
+    "STAGING_EMAIL_BACKEND",
     default="django.core.mail.backends.console.EmailBackend",
 )
 
 
 # Default empty string required for Docker build to succeed.
 EMAIL_HOST = env(
-    "PROD_EMAIL_HOST",
+    "STAGING_EMAIL_HOST",
     default="",
 )
 
 
 EMAIL_HOST_PASSWORD = env(
-    "PROD_EMAIL_HOST_PASSWORD",
+    "STAGING_EMAIL_HOST_PASSWORD",
     default="",
 )
 
 EMAIL_HOST_USER = env(
-    "PROD_EMAIL_HOST_USER",
+    "STAGING_EMAIL_HOST_USER",
     default="",
 )
 EMAIL_PORT = env(
-    "PROD_EMAIL_PORT",
+    "STAGING_EMAIL_PORT",
     default="",
 )
 EMAIL_USE_TLS = env(
-    "PROD_EMAIL_USE_TLS",
+    "STAGING_EMAIL_USE_TLS",
     default="",
 )
 
 INTERNAL_IPS = env.list(
-    "PROD_INTERNAL_IPS",
+    "STAGING_INTERNAL_IPS",
     default=[""],
 )
 
@@ -96,55 +95,52 @@ LOGGING["handlers"]["rotated_logs"]["filename"] = DJANGO_LOG_FILE  # noqa: F405
 
 
 SECRET_KEY = env(
-    "PROD_DJANGO_SECRET_KEY",
-    default="!!!INSECURE_PRODUCTION_SECRET!!!",
+    "STAGING_DJANGO_SECRET_KEY",
+    default="!!!INSECURE_STAGING_SECRET!!!",
 )
 
 
-# Check it is safe to run in production.
+# Check it is safe to run in staging.
 assert (  # nosec
-    env("PROD_DJANGO_SECRET_KEY") != "!!!INSECURE_PRODUCTION_SECRET!!!"
-), "The DJANGO_SECRET_KEY must be set for production."
+    env("STAGING_DJANGO_SECRET_KEY") != "!!!INSECURE_STAGING_SECRET!!!"
+), "The DJANGO_SECRET_KEY must be set for staging."
 
-assert (  # nosec
-    DEBUG is False
-), "Production can't be run in DEBUG mode for security reasons."
 
 # `USE_STATIC` options are `local` or `S3`
-USE_STATIC = env("PROD_USE_STATIC", default="S3")
+USE_STATIC = env("STAGING_USE_STATIC", default="Local")
 
 
 try:
     # Digital Ocean S3 Storage Configuration
     if USE_STATIC == "S3":
         AWS_ACCESS_KEY_ID = env(
-            "PROD_AWS_ACCESS_KEY_ID",
-            default="PRODUCTION_AWS_KEY_NOT_SET",
+            "STAGING_AWS_ACCESS_KEY_ID",
+            default="STAGING_AWS_KEY_NOT_SET",
         )
         AWS_SECRET_ACCESS_KEY = env(
-            "PROD_AWS_SECRET_ACCESS_KEY",
-            default="PROD_AWS_SECRET_NOT_SET",
+            "STAGING_AWS_SECRET_ACCESS_KEY",
+            default="STAGING_AWS_SECRET_NOT_SET",
         )
 
         AWS_S3_REGION_NAME = env(
-            "PROD_AWS_S3_REGION_NAME",
+            "STAGING_AWS_S3_REGION_NAME",
             default="syd1",
         )
         AWS_S3_ENDPOINT_URL = env(
-            "PROD_AWS_S3_ENDPOINT_URL",
+            "STAGING_AWS_S3_ENDPOINT_URL",
             default=f"https://{AWS_S3_REGION_NAME}.digitaloceanspaces.com",
         )
         AWS_STORAGE_BUCKET_NAME = env(
-            "PROD_AWS_STORAGE_BUCKET_NAME",
+            "STAGING_AWS_STORAGE_BUCKET_NAME",
             default="tb-s3",
         )
         AWS_LOCATION = env(
-            "PROD_AWS_LOCATION",
+            "STAGING_AWS_LOCATION",
             default=f"https://{AWS_STORAGE_BUCKET_NAME}.{AWS_S3_REGION_NAME}.digitaloceanspaces.com",
         )
         # This isnt working when using an ENV VAR
         # AWS_S3_OBJECT_PARAMETERS = env(
-        #     "PROD_AWS_S3_OBJECT_PARAMETERS",
+        #     "STAGING_AWS_S3_OBJECT_PARAMETERS",
         #     {"CacheControl": "max-age=1"},
         # )
         AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=1"}
@@ -166,23 +162,24 @@ try:
 
         # Static url must end with default STATIC_URL from env var or base.py added to
         # S3 storage location.
-        STATIC_URL = env("PROD_STATIC_URL", default="static/")
+
+        STATIC_URL = env("STAGING_STATIC_URL", default="static-st/")
 
         # Media url must end with default MEDIA_URL from env var or base.py added to
         # S3 storage location.
-        MEDIA_URL = env("PROD_MEDIA_URL", default="media/")
+        MEDIA_URL = env("STAGING_MEDIA_URL", default="media-st/")
 
         # Set the url for the css file
-        PROD_DJANGO_TEMPLATES_CSS = f"{STATIC_URL}css/styles.css"
+        STAGING_DJANGO_TEMPLATES_CSS = f"{STATIC_URL}css/styles.css"
 
     elif USE_STATIC != "S3":
         raise ImproperlyConfigured(
-            "Production environment USE_STATIC must be S3, it is configured to %s."
+            "Staging environment USE_STATIC must be S3, it is configured to %s."
             % (USE_STATIC),
         )
 
 except ImproperlyConfigured:
     logger.critical(
-        "Production environment USE_STATIC must be S3, it is configured to %s."
+        "Staging environment USE_STATIC must be S3, it is configured to %s."
         % (USE_STATIC),
     )
