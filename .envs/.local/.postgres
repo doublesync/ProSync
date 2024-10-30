@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=prosync
+POSTGRES_USER=RzzpYyWJBByYAkOqLqIDhuleZbiilmXD
+POSTGRES_PASSWORD=pVt0i3EXIscko0zWcpnNVAB3OmP7lZnQxrZqIgHnZivM7bIcq1amFWVJMFhs54jr
